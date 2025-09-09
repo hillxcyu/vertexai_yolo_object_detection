@@ -27,15 +27,12 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - [%
 # ==============================================================================
 # Configuration Settings
 # ==============================================================================
-PROJECT_ID = "YOUR PROJECT ID"
-REGION = "YOUR PROJECT REGION"
-# REGION = "us-central1"
-STAGING_BUCKET = "YOUR STAGING_BUCKET"
-# STAGING_BUCKET = "gs://yolo_training_artifacts"
-DATASET_ID = "YOUR DATASET_ID"
-# DATASET_ID = "1214135766438390813"
-BASE_JOB_NAME = "YOUR JOB NAME"
-# BASE_JOB_NAME = "yolo12_object_detection_product"
+# PROJECT_ID = "YOUR PROJECT ID"
+PROJECT_ID = "vital-octagon-19612"
+REGION = "us-central1"
+STAGING_BUCKET = "gs://hill_yolo_training"
+DATASET_ID = "3614238206767136768"
+BASE_JOB_NAME = "handover_yolo_training"
 
 DATASET_RESOURCE_NAME = f"projects/{PROJECT_ID}/locations/{REGION}/datasets/{DATASET_ID}"
 ANNOTATION_SCHEMA_URI = aiplatform.schema.dataset.annotation.image.bounding_box
@@ -64,7 +61,7 @@ logging.info(f"Using training container as base for CPR build: {TRAIN_CONTAINER_
 
 # --- Compute/Training Config (Single Replica) ---
 MACHINE_TYPE = "n1-standard-4"; ACCELERATOR_TYPE = "NVIDIA_TESLA_T4"; ACCELERATOR_COUNT = 1; REPLICA_COUNT = 1
-TRAINING_ARGS = ["--output-artifact-uri", GCS_MODEL_ARTIFACT_DIR, "--model_variant=/gcs/yolo_training_artifacts/yolo_artifacts_20250416_105831/best.pt", "--epochs=40", "--batch_size=16", "--img_size=640"] # <--- !!! set training parameters here, use --model_variant and point to a existing weights file (.pt ) will initiate the training from existing weights.
+TRAINING_ARGS = ["--output-artifact-uri", GCS_MODEL_ARTIFACT_DIR, "--model_variant=/gcs/yolo_training_artifacts/yolo_artifacts_20250416_105831/best.pt", "--epochs=8", "--batch_size=16", "--img_size=640"] # <--- !!! set training parameters here, use --model_variant and point to a existing weights file (.pt ) will initiate the training from existing weights.
 REQUIREMENTS_TRAIN = ["ultralytics","google-cloud-storage","pyyaml"]
 
 # --- Define Schema URIs directly as strings ---

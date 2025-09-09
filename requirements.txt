@@ -1,2 +1,4 @@
 ultralytics
 google-cloud-aiplatform[prediction]>=1.16.0
+google-cloud-artifact-registry 
+google-api-core
