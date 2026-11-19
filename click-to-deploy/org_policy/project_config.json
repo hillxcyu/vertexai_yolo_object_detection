@@ -1,0 +1,28 @@
+{
+  "constraints": [
+    {
+      "constraint": "constraints/iam.allowedPolicyMemberDomains",
+      "restore_post_deployment": true
+    },
+    {
+      "constraint": "constraints/compute.vmExternalIpAccess",
+      "restore_post_deployment": true
+    },
+    {
+      "constraint": "constraints/compute.requireShieldedVm",
+      "restore_post_deployment": true
+    },
+    {
+      "constraint": "constraints/storage.uniformBucketLevelAccess",
+      "restore_post_deployment": true
+    },
+    {
+      "constraint": "constraints/storage.publicAccessPrevention",
+      "restore_post_deployment": true
+    },
+    {
+      "constraint": "constraints/iam.disableServiceAccountKeyCreation",
+      "restore_post_deployment": true
+    }
+  ]
+}

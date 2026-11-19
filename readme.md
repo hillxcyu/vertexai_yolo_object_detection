@@ -1,57 +1,67 @@
-This is a great start. I've restructured, formatted, and clarified the text to make it cleaner and easier for a new user to follow.
+# Vertex AI Custom YOLO Training & Serving MLOps Blueprint
 
------
+This project provides a complete end-to-end MLOps workflow to:
 
-# Vertex AI Custom YOLO Training Pipeline
+1. **Train** a custom Ultralytics YOLO object detection model on a Vertex AI Managed Dataset using a **Vertex AI Custom Training job** with GCS FUSE mounts.
+2. **Build** a custom inference Docker container using a **Vertex AI Custom Prediction Routine (CPR)** (`cpr_src/predictor.py`) that formats predictions to match the standard AutoML Object Detection schema.
+3. **Register & Serve** the trained model, container image, and prediction schemas in the **Vertex AI Model Registry** and **Vertex AI Endpoints**.
 
-This project provides a complete pipeline to:
+> For the full seller & deployment guide, see [docs/DEMO_GUIDE.md](docs/DEMO_GUIDE.md).
 
-1.  Train a YOLO model on a Vertex AI Managed Dataset using a **Vertex AI Custom Training job**.
-2.  Build a custom inference Docker container using a **local model and a custom prediction routine**. This routine formats the output to match the standard prediction schema used by AutoML object detection models.
-3.  Upload the trained model, container image, and schemas to the **Vertex AI Model Registry**.
+## Repository Structure
+
+* `launch_training_job.py` — End-to-end orchestration script: ensures Artifact Registry repo, copies Vertex AI schemas, runs custom training, builds/pushes the CPR image, and uploads the model to Vertex AI Model Registry.
+* `train.py` — Custom training entrypoint executed on Vertex AI Training; converts Vertex AI JSONL manifests (via `/gcs/` FUSE) to YOLO format, trains the model, and uploads `best.pt` and `class_map.json` to GCS.
+* `create_AR.py` — Helper to verify or create the Docker Artifact Registry repository.
+* `cpr_src/` — Custom Prediction Routine (`predictor.py` + `requirements.txt`) for AutoML-compatible object detection inference.
+* `yolo_dataset_tools/` — Utilities (`yolo2vertexCSV.py`, `create_dataset.py`) to convert local YOLO datasets into Vertex AI Managed Image Datasets.
+* `click-to-deploy/` — C2D-compliant Terraform configuration and pinned Python requirements to provision required APIs, GCS bucket, Artifact Registry repository, and least-privilege service accounts.
 
 ## Prerequisites
 
-  * [Docker](https://docs.docker.com/get-docker/) must be installed and running.
-  * Python 3 and required packages.
-
-Install the Python dependencies:
+* [Docker](https://docs.docker.com/get-docker/) installed and running (for local CPR container builds).
+* Python 3.10+ and required packages:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## ⚙️ Configuration and Setup
+## Quick Start
 
-Follow these steps before running the pipeline.
+### 1. Provision Infrastructure (Optional via Terraform)
 
-### 1\. GCP Authentication
+```bash
+cd click-to-deploy
+terraform init
+terraform apply -var="project_id=YOUR_PROJECT_ID" -var="data_location=us-central1"
+```
 
-You must authenticate both your local SDK environment and your application default credentials.
+### 2. GCP Authentication
+
+Authenticate both your local SDK environment and application default credentials:
 
 ```bash
 gcloud auth login
 gcloud auth application-default login
+gcloud auth configure-docker us-central1-docker.pkg.dev
 ```
 
-### 2\. Dataset Location (Important Requirement)
+### 3. Dataset Location Requirement
 
-Your Vertex AI Managed Dataset **must** be located in a GCS bucket within the **same Google Cloud Project** where this training job will run.
+Your Vertex AI Managed Dataset **must** be located in a GCS bucket within the **same Google Cloud Project** where the training job runs. Vertex AI Custom Training mounts all GCS buckets from the host project to `/gcs/` inside the training container; buckets from other projects will not be mounted.
 
-This is a firm requirement because the custom training job utilizes the GCS FUSE mount feature. This feature automatically mounts all GCS buckets *from the host project* to the `/gcs/` directory in the training container. Buckets from *other* projects will not be mounted, and the job will fail.
+### 4. Configure & Run
 
-### 3\. Pipeline Configuration
+Set the environment variables (or update the defaults at the top of `launch_training_job.py`):
 
-Edit the variables at the top of `launch_training_job.py` to match your environment. At a minimum, you must set your project-specific details:
+```bash
+export PROJECT_ID="YOUR_PROJECT_ID"
+export REGION="us-central1"
+export STAGING_BUCKET="gs://YOUR_GCS_BUCKET"
+export DATASET_ID="YOUR_VERTEX_AI_DATASET_ID"
+```
 
-  * `PROJECT_ID`
-  * `REGION`
-  * `BUCKET_URI` (the staging bucket for the pipeline)
-  * Dataset and Model display names
-
-## 🚀 How to Run
-
-Once configured, launch the entire pipeline by executing the main script:
+Then launch the end-to-end pipeline:
 
 ```bash
 python3 launch_training_job.py

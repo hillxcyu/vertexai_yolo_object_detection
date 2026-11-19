@@ -1,0 +1,7 @@
+google-cloud-aiplatform[prediction]>=1.16.0
+google-cloud-artifact-registry
+google-cloud-storage
+google-api-core
+pyyaml
+pillow
+pandas

@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 import pandas as pd
 from PIL import Image
@@ -21,7 +35,7 @@ def convert_yolo_to_vertexai_single_row_csv(local_data_dir, output_csv_file, gcs
                                      └── test/
         output_csv_file (str): Path to the output Vertex AI CSV index file.
         gcs_bucket_name (str): The name of your Google Cloud Storage bucket
-                                 where the images will be stored (e.g., 'hill_yolo_training').
+                                 where the images will be stored (e.g., 'your-gcs-bucket').
     """
     data = []
     for split in ['train', 'val', 'test']:
@@ -75,10 +89,10 @@ def convert_yolo_to_vertexai_single_row_csv(local_data_dir, output_csv_file, gcs
     df.to_csv(output_csv_file, index=False, header=False)
     print(f"Successfully created Vertex AI CSV index file: {output_csv_file}")
 
-local_data_directory = 'stockout'  # Replace with the actual path to your local dataset
-img_folder=local_data_directory
+local_data_directory = 'retail_shelf_sample'  # Replace with the actual path to your local dataset
+img_folder = local_data_directory
 output_csv_file = 'vertex_ai_single_row_index.csv'
-gcs_bucket = 'hill_yolo_training'  # Replace with your GCS bucket name
+gcs_bucket = os.environ.get('GCS_BUCKET', 'YOUR_GCS_BUCKET')  # Replace with your GCS bucket name
 
 convert_yolo_to_vertexai_single_row_csv(local_data_directory, output_csv_file, gcs_bucket,img_folder)
 

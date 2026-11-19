@@ -1,3 +1,17 @@
+# Copyright 2026 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # launch_training_job.py (CPR Upload - Using LocalModel build - Simplified State Check - Cleaned)
 # Builds custom CPR image, runs training, uploads model using LocalModel object.
 
@@ -27,12 +41,11 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - [%
 # ==============================================================================
 # Configuration Settings
 # ==============================================================================
-# PROJECT_ID = "YOUR PROJECT ID"
-PROJECT_ID = "vital-octagon-19612"
-REGION = "us-central1"
-STAGING_BUCKET = "gs://hill_yolo_training"
-DATASET_ID = "3614238206767136768"
-BASE_JOB_NAME = "handover_yolo_training"
+PROJECT_ID = os.environ.get("PROJECT_ID", "YOUR_PROJECT_ID")
+REGION = os.environ.get("REGION", "us-central1")
+STAGING_BUCKET = os.environ.get("STAGING_BUCKET", "gs://YOUR_GCS_BUCKET")
+DATASET_ID = os.environ.get("DATASET_ID", "YOUR_VERTEX_AI_DATASET_ID")
+BASE_JOB_NAME = os.environ.get("BASE_JOB_NAME", "yolo_custom_training")
 
 DATASET_RESOURCE_NAME = f"projects/{PROJECT_ID}/locations/{REGION}/datasets/{DATASET_ID}"
 ANNOTATION_SCHEMA_URI = aiplatform.schema.dataset.annotation.image.bounding_box
@@ -61,7 +74,7 @@ logging.info(f"Using training container as base for CPR build: {TRAIN_CONTAINER_
 
 # --- Compute/Training Config (Single Replica) ---
 MACHINE_TYPE = "n1-standard-4"; ACCELERATOR_TYPE = "NVIDIA_TESLA_T4"; ACCELERATOR_COUNT = 1; REPLICA_COUNT = 1
-TRAINING_ARGS = ["--output-artifact-uri", GCS_MODEL_ARTIFACT_DIR, "--model_variant=/gcs/yolo_training_artifacts/yolo_artifacts_20250416_105831/best.pt", "--epochs=8", "--batch_size=16", "--img_size=640"] # <--- !!! set training parameters here, use --model_variant and point to a existing weights file (.pt ) will initiate the training from existing weights.
+TRAINING_ARGS = ["--output-artifact-uri", GCS_MODEL_ARTIFACT_DIR, "--model_variant=yolov8n.pt", "--epochs=8", "--batch_size=16", "--img_size=640"] # <--- !!! set training parameters here; point --model_variant to an existing weights file (.pt) to resume training from existing weights.
 REQUIREMENTS_TRAIN = ["ultralytics","google-cloud-storage","pyyaml"]
 
 # --- Define Schema URIs directly as strings ---
