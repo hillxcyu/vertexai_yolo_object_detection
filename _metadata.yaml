@@ -51,6 +51,6 @@ artifacts:
 
     link: https://discuss.google.dev/t/production-ready-yolo-model-training-serving-workflow-on-vertex-ai/263788/4
 featured_artifact_title: GitHub Source Repository
-# images:
-#   - https://storage.cloud.google.com/<bucket>/scene-00-hero-card.png
-# click_to_deploy_path: <demo_id>-vertexai-yolo/tree/main/click-to-deploy
+images:
+  - https://screenshot.googleplex.com/FRfGJBN3gUf7vVS.png
+click_to_deploy_path: 2379-vertex-ai-custom-yolo-training-and-serving-mlops-blueprint/tree/main/click-to-deploy
